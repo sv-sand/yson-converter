@@ -24,8 +24,8 @@ class ConverterYsonToCsvTest {
         Files.writeString(source, "{score=42;label=\"pass\"}");
 
         Config config = mock(Config.class);
-        when(config.getSourcePath()).thenReturn(source);
-        when(config.getResultPath()).thenReturn(result);
+        when(config.getSettings().sourcePath()).thenReturn(source);
+        when(config.getSettings().resultPath()).thenReturn(result);
 
         ConverterYsonToCsv converter = new ConverterYsonToCsv(config);
 
@@ -54,8 +54,8 @@ class ConverterYsonToCsvTest {
         Files.writeString(source, "{id=1;name=\"Alice\"};{id=2;name=\"Bob\"}");
 
         Config config = mock(Config.class);
-        when(config.getSourcePath()).thenReturn(source);
-        when(config.getResultPath()).thenReturn(result);
+        when(config.getSettings().sourcePath()).thenReturn(source);
+        when(config.getSettings().resultPath()).thenReturn(result);
 
         ConverterYsonToCsv converter = new ConverterYsonToCsv(config);
 
@@ -88,8 +88,8 @@ class ConverterYsonToCsvTest {
         Path result = tempDir.resolve("output.csv");
 
         Config config = mock(Config.class);
-        when(config.getSourcePath()).thenReturn(source);
-        when(config.getResultPath()).thenReturn(result);
+        when(config.getSettings().sourcePath()).thenReturn(source);
+        when(config.getSettings().resultPath()).thenReturn(result);
 
         ConverterYsonToCsv converter = new ConverterYsonToCsv(config);
 

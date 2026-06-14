@@ -1,5 +1,7 @@
 package ru.svsand.ysonconverter;
 
+import javafx.application.Platform;
+import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Component;
 import ru.svsand.ysonconverter.converter.Converter;
 import ru.svsand.ysonconverter.converter.ConverterYsonToCsv;
 import ru.svsand.ysonconverter.converter.ConverterYsonToJson;
+import ru.svsand.ysonconverter.ui.MainWindow;
 
 import java.io.IOException;
 
@@ -32,7 +35,9 @@ public class Runner implements ApplicationRunner {
         if (config.isHelp())
             printHelp();
         else if (config.isCliMode())
-            convert();
+            cliConvert();
+        else
+            launchUi();
     }
 
     private void printHelp() {
@@ -40,10 +45,10 @@ public class Runner implements ApplicationRunner {
                 Converter YSON files to JSON, CSV
                 Help dialog:
                     java -jar yson-converter.jar --help
-                
+
                 Launch in graphic interface mode:
                     java -jar yson-converter.jar
-                
+
                 Usage in cli mode:
                     java -jar yson-converter.jar cli --source=<file.yson> --result=<file>
                 Options:
@@ -52,11 +57,11 @@ public class Runner implements ApplicationRunner {
                 """);
     }
 
-    private void convert() {
+    private void cliConvert() {
         Converter converter;
-        if (config.getResultPath().toString().endsWith(".json"))
+        if (config.getSettings().resultPath().toString().endsWith(".json"))
             converter = new ConverterYsonToJson(config);
-        else if (config.getResultPath().toString().endsWith(".csv"))
+        else if (config.getSettings().resultPath().toString().endsWith(".csv"))
             converter = new ConverterYsonToCsv(config);
         else
             throw new RuntimeException("Wrong result path");
@@ -67,5 +72,13 @@ public class Runner implements ApplicationRunner {
             log.error("Failed to convert file", e);
             exit(1);
         }
+    }
+
+    private void launchUi() {
+        Platform.startup(() -> {
+            Stage stage = new Stage();
+            new MainWindow(stage);
+            stage.show();
+        });
     }
 }

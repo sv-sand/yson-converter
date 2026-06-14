@@ -31,20 +31,26 @@ public class ConverterYsonToJson implements Converter {
      * @throws IOException if reading the input or writing the output fails
      */
     public void convert() throws IOException {
-        log.info("Start conversion {} to {}", config.getSourcePath().getFileName(), config.getResultPath().getFileName());
+        log.info("Start conversion {} to {}",
+                config.getSettings().sourcePath().getFileName(),
+                config.getSettings().resultPath().getFileName()
+        );
 
         log.info("Parsing YSON");
-        YTreeNode ysonNode = parseYson(config.getSourcePath());
+        YTreeNode ysonNode = parseYson(config.getSettings().sourcePath());
 
         log.info("Converting YSON to JSON");
         JsonNode jsonNode = YsonJsonConverter.yson2json(JsonNodeFactory.instance, ysonNode);
 
         log.info("Writing JSON");
-        File outputFile = new File(config.getResultPath().toString());
+        File outputFile = new File(config.getSettings().resultPath().toString());
         objectMapper.writerWithDefaultPrettyPrinter()
                 .writeValue(outputFile, jsonNode);
 
-        log.info("File {} converted to {}", config.getSourcePath().getFileName(), config.getResultPath().getFileName());
+        log.info("File {} converted to {}",
+                config.getSettings().sourcePath().getFileName(),
+                config.getSettings().resultPath().getFileName()
+        );
     }
 
     private YTreeNode parseYson(Path inputPath) throws IOException {

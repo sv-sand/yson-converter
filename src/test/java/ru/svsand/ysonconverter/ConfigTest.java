@@ -36,8 +36,8 @@ class ConfigTest {
 
         // Assert
         assertThat(config.isCliMode()).isFalse();
-        assertThat(config.getSourcePath()).isNull();
-        assertThat(config.getResultPath()).isNull();
+        assertThat(config.getSettings().sourcePath()).isNull();
+        assertThat(config.getSettings().resultPath()).isNull();
     }
 
     @Test
@@ -53,8 +53,8 @@ class ConfigTest {
 
         // Assert
         assertThat(config.isCliMode()).isTrue();
-        assertThat(config.getSourcePath()).isEqualTo(Path.of("data.yson"));
-        assertThat(config.getResultPath()).isEqualTo(Path.of("output.json"));
+        assertThat(config.getSettings().sourcePath()).isEqualTo(Path.of("data.yson"));
+        assertThat(config.getSettings().resultPath()).isEqualTo(Path.of("output.json"));
     }
 
     @Test
@@ -70,7 +70,7 @@ class ConfigTest {
 
         // Assert
         assertThat(config.isCliMode()).isTrue();
-        assertThat(config.getSourcePath()).isEqualTo(Path.of("data.yson"));
-        assertThat(config.getResultPath()).isEqualTo(Path.of("output.csv"));
+        assertThat(config.getSettings().sourcePath()).isEqualTo(Path.of("data.yson"));
+        assertThat(config.getSettings().resultPath()).isEqualTo(Path.of("output.csv"));
     }
 }

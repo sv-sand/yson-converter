@@ -1,10 +1,8 @@
 package ru.svsand.ysonconverter;
 
-import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
-import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -17,8 +15,6 @@ import static java.lang.System.exit;
 @Slf4j
 public class Config {
 
-    private final ApplicationArguments args;
-
     @Getter
     private boolean help;
 
@@ -26,60 +22,70 @@ public class Config {
     private boolean cliMode;
 
     @Getter
-    private Path sourcePath;
+    private Settings settings;
 
-    @Getter
-    private Path resultPath;
+    public record Settings (
+            Path sourcePath,
+            Path resultPath
+    ) {}
 
     public Config(ApplicationArguments args) {
-        this.args = args;
-        init();
+        parseArgs(args);
     }
 
-    private void init() {
-        help = args.containsOption("help");
-        cliMode = getCliModeOption();
+    public Config(Settings settings) {
+        this.settings = settings;
+    }
+
+    private void parseArgs(ApplicationArguments args) {
+        help = parseHelp(args);
+        cliMode = parseCliMode(args);
+
         try {
-            if (cliMode)
-                parseCliArgs();
+            if (cliMode) {
+                settings = new Settings(
+                        parseSourcePath(args),
+                        parseResultPath(args)
+                );
+            }
         } catch (IllegalArgumentException e) {
             log.error("Incorrect options", e);
             exit(1);
         }
     }
 
-    private boolean getCliModeOption() {
+    private boolean parseHelp(ApplicationArguments args) {
+        return args.containsOption("help");
+    }
+
+    private boolean parseCliMode(ApplicationArguments args) {
         if (args.getNonOptionArgs().isEmpty())
             return false;
 
         return args.getNonOptionArgs().getFirst().equals("cli");
     }
 
-    private void parseCliArgs() throws IllegalArgumentException {
-        String sourceValue = getCliOption("source");
-        if (sourceValue.isEmpty())
+    private Path parseSourcePath(ApplicationArguments args) {
+        List<String> values = args.getOptionValues("source");
+        if (values == null || values.getFirst().isEmpty())
             throw new IllegalArgumentException("Source path is required");
-        else if (!sourceValue.endsWith(".yson"))
-            throw new IllegalArgumentException("Source path should have .yson extension");
-        else
-            sourcePath = Path.of(sourceValue);
 
-        String resultValue = getCliOption("result");
-        if (resultValue.isEmpty())
-            throw new IllegalArgumentException("Result path is required");
-        else if (!resultValue.endsWith(".json") && !resultValue.endsWith(".csv"))
-            throw new IllegalArgumentException("Result path should have .json or .csv extension");
-        else
-            resultPath = Path.of(resultValue);
+        String value = values.getFirst();
+        if (!value.endsWith(".yson"))
+            throw new IllegalArgumentException("Source path should have .yson extension");
+
+        return Path.of(value);
     }
 
-    private String getCliOption(String name) {
-        String defaultValue = "";
+    private Path parseResultPath(ApplicationArguments args) {
+        List<String> values = args.getOptionValues("result");
+        if (values == null || values.getFirst().isEmpty())
+            throw new IllegalArgumentException("Result path is required");
 
-        List<String> values = args.getOptionValues(name);
-        if (values == null)
-            return defaultValue;
+        String value = values.getFirst();
+        if (!value.endsWith(".yson") && !value.endsWith(".csv"))
+            throw new IllegalArgumentException("Result path should have .json or .csv extension");
 
-        return values.getFirst();
+        return Path.of(value);
     }
 }

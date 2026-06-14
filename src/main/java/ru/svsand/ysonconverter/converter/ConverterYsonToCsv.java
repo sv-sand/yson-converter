@@ -28,20 +28,26 @@ public class ConverterYsonToCsv implements Converter {
 
     @Override
     public void convert() throws IOException {
-        log.info("Start conversion {} to {}", config.getSourcePath().getFileName(), config.getResultPath().getFileName());
+        log.info("Start conversion {} to {}",
+                config.getSettings().sourcePath().getFileName(),
+                config.getSettings().resultPath().getFileName()
+        );
 
         headersWrote = false;
         buffer.setLength(0);
 
         log.info("Parsing YSON");
-        try (InputStream inputStream = Files.newInputStream(config.getSourcePath())) {
+        try (InputStream inputStream = Files.newInputStream(config.getSettings().sourcePath())) {
             parseYson(inputStream);
         } catch (IOException e) {
             log.error("Failed to parse YSON", e);
             throw e;
         }
 
-        log.info("File {} has been converted to {}", config.getSourcePath().getFileName(), config.getResultPath().getFileName());
+        log.info("File {} has been converted to {}",
+                config.getSettings().sourcePath().getFileName(),
+                config.getSettings().resultPath().getFileName()
+        );
     }
 
     private void parseYson(InputStream inputStream) {
@@ -78,7 +84,7 @@ public class ConverterYsonToCsv implements Converter {
                 .map(Object::toString)
                 .collect(Collectors.joining(";"));
 		try {
-			Files.writeString(config.getResultPath(), headers);
+			Files.writeString(config.getSettings().resultPath(), headers);
 	    } catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -89,7 +95,7 @@ public class ConverterYsonToCsv implements Converter {
 
     private void writeBufferRows() {
 		try {
-			Files.writeString(config.getResultPath(), buffer.toString(), StandardOpenOption.APPEND);
+			Files.writeString(config.getSettings().resultPath(), buffer.toString(), StandardOpenOption.APPEND);
 	    } catch (IOException e) {
 			throw new RuntimeException(e);
 		}
