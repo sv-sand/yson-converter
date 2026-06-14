@@ -27,8 +27,7 @@ class ConverterYsonToJsonTest {
         Files.writeString(source, "{a=1;b=\"hello\";c=%true}");
 
         Config config = mock(Config.class);
-        when(config.getSettings().sourcePath()).thenReturn(source);
-        when(config.getSettings().resultPath()).thenReturn(result);
+        when(config.getSettings()).thenReturn(new Config.Settings(source, result));
 
         ConverterYsonToJson converter = new ConverterYsonToJson(config);
 
@@ -51,8 +50,7 @@ class ConverterYsonToJsonTest {
         Files.writeString(source, "{count=42;ratio=3.14}");
 
         Config config = mock(Config.class);
-        when(config.getSettings().sourcePath()).thenReturn(source);
-        when(config.getSettings().resultPath()).thenReturn(result);
+        when(config.getSettings()).thenReturn(new Config.Settings(source, result));
 
         ConverterYsonToJson converter = new ConverterYsonToJson(config);
 
@@ -72,8 +70,7 @@ class ConverterYsonToJsonTest {
         Path result = tempDir.resolve("output.json");
 
         Config config = mock(Config.class);
-        when(config.getSettings().sourcePath()).thenReturn(source);
-        when(config.getSettings().resultPath()).thenReturn(result);
+        when(config.getSettings()).thenReturn(new Config.Settings(source, result));
 
         ConverterYsonToJson converter = new ConverterYsonToJson(config);
 

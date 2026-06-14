@@ -36,8 +36,7 @@ class ConfigTest {
 
         // Assert
         assertThat(config.isCliMode()).isFalse();
-        assertThat(config.getSettings().sourcePath()).isNull();
-        assertThat(config.getSettings().resultPath()).isNull();
+        assertThat(config.getSettings()).isNull();
     }
 
     @Test

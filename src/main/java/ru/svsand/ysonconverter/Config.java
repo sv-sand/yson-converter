@@ -83,7 +83,7 @@ public class Config {
             throw new IllegalArgumentException("Result path is required");
 
         String value = values.getFirst();
-        if (!value.endsWith(".yson") && !value.endsWith(".csv"))
+        if (!value.endsWith(".json") && !value.endsWith(".csv"))
             throw new IllegalArgumentException("Result path should have .json or .csv extension");
 
         return Path.of(value);
