@@ -94,9 +94,10 @@ example/output.json  # Converted JSON output
 
 # Run a single test class
 ./gradlew test --tests "ru.svsand.ysonconverter.YsonConverterApplicationTests"
-```
 
-Logs are written to `./logs/spring.log` (rolling, max 10 MB per file, 100 MB total cap).
+# Run a single test method
+./gradlew test --tests "ru.svsand.ysonconverter.YsonConverterApplicationTests.contextLoads"
+```
 
 ## Dependencies
 
