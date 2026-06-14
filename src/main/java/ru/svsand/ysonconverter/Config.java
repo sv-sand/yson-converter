@@ -15,10 +15,12 @@ import static java.lang.System.exit;
  * Spring configuration that wires application-level beans.
  */
 @Slf4j
-@Configuration
 public class Config {
 
     private final ApplicationArguments args;
+
+    @Getter
+    private boolean help;
 
     @Getter
     private boolean cliMode;
@@ -31,10 +33,11 @@ public class Config {
 
     public Config(ApplicationArguments args) {
         this.args = args;
+        init();
     }
 
-    @PostConstruct
-    void init() {
+    private void init() {
+        help = args.containsOption("help");
         cliMode = getCliModeOption();
         try {
             if (cliMode)

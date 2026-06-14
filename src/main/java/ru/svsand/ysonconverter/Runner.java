@@ -19,11 +19,7 @@ import static java.lang.System.exit;
 @Component
 public class Runner implements ApplicationRunner {
 
-    private final Config config;
-
-    public Runner(Config config) {
-        this.config = config;
-    }
+    private Config config;
 
     /**
      * Entry point called by Spring Boot after the application context is ready.
@@ -32,9 +28,9 @@ public class Runner implements ApplicationRunner {
      */
     @Override
     public void run(ApplicationArguments args) {
-        if (args.containsOption("help"))
+        config = new Config(args);
+        if (config.isHelp())
             printHelp();
-
         else if (config.isCliMode())
             convert();
     }
@@ -45,8 +41,8 @@ public class Runner implements ApplicationRunner {
                 Help dialog:
                     java -jar yson-converter.jar --help
                 
-                Launch in interface mode:
-                    java -jar yson-converter.jar ui
+                Launch in graphic interface mode:
+                    java -jar yson-converter.jar
                 
                 Usage in cli mode:
                     java -jar yson-converter.jar cli --source=<file.yson> --result=<file>
