@@ -1,0 +1,14 @@
+spring:
+    application.name: yson-converter
+    main.banner-mode: off
+
+logging:
+    level:
+        root: INFO
+        org.springframework: INFO
+        org.hibernate: ERROR
+    file:
+        path: ./logs
+        max-size: 10MB
+        total-size-cap: 100MB
+        max-history: 5
