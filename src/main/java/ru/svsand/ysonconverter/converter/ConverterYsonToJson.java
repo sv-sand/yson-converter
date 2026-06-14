@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.svsand.ysonconverter.Config;
 import tech.ytsaurus.ysonjsonconverter.YsonJsonConverter;
 import tech.ytsaurus.ysontree.*;
@@ -22,7 +21,6 @@ public class ConverterYsonToJson implements Converter {
     private final Config config;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
     public ConverterYsonToJson(Config config) {
         this.config = config;
     }
@@ -50,13 +48,8 @@ public class ConverterYsonToJson implements Converter {
     }
 
     private YTreeNode parseYson(Path inputPath) throws IOException {
-        YTreeNode ysonNode;
         try (InputStream inputStream = Files.newInputStream(inputPath)) {
-            ysonNode = YTreeTextSerializer.deserialize(inputStream);
-        } catch (IOException e) {
-            log.error("Failed to parse YSON", e);
-            throw e;
+            return YTreeTextSerializer.deserialize(inputStream);
         }
-        return ysonNode;
     }
 }

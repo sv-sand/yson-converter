@@ -1,9 +1,6 @@
 package ru.svsand.ysonconverter.converter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import ru.svsand.ysonconverter.Config;
 import tech.ytsaurus.yson.YsonConsumer;
 import tech.ytsaurus.yson.YsonParser;
@@ -16,18 +13,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Spring component that converts YSON files to JSON format.
+ * Converter that transforms YSON list-fragment files into semicolon-delimited CSV.
  */
 @Slf4j
-@Component
 public class ConverterYsonToCsv implements Converter {
 
     private final Config config;
+    private final StringBuffer buffer = new StringBuffer();
+    private boolean headersWrote = false;
 
-    StringBuffer buffer = new StringBuffer();
-    boolean headersWrote = false;
-
-    @Autowired
     public ConverterYsonToCsv(Config config) {
         this.config = config;
     }
@@ -37,6 +31,7 @@ public class ConverterYsonToCsv implements Converter {
         log.info("Start conversion {} to {}", config.getSourcePath().getFileName(), config.getResultPath().getFileName());
 
         headersWrote = false;
+        buffer.setLength(0);
 
         log.info("Parsing YSON");
         try (InputStream inputStream = Files.newInputStream(config.getSourcePath())) {
@@ -58,7 +53,7 @@ public class ConverterYsonToCsv implements Converter {
                 super.onEndMap();
             }
         };
-        parser.parseListFragmentItem(consumer);
+        while (parser.parseListFragmentItem(consumer)) {}
         writeBufferRows();
     }
 

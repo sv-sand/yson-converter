@@ -1,8 +1,6 @@
 package ru.svsand.ysonconverter;
 
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -23,7 +21,6 @@ public class Launcher implements ApplicationRunner {
 
     private final Config config;
 
-    @Autowired
     public Launcher(Config config) {
         this.config = config;
     }
@@ -34,7 +31,7 @@ public class Launcher implements ApplicationRunner {
      * @param args application arguments
      */
     @Override
-    public void run(@NonNull ApplicationArguments args) {
+    public void run(ApplicationArguments args) {
         if (config.isCliMode())
             convert();
     }

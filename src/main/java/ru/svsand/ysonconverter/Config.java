@@ -34,17 +34,16 @@ public class Config {
     }
 
     @PostConstruct
-    private void init() {
-        // Most important option
+    void init() {
         cliMode = getCliModeOption();
-		try {
-			if(cliMode)
+        try {
+            if (cliMode)
                 parseCliArgs();
-	    } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             log.error("Incorrect options", e);
             exit(1);
-		}
-	}
+        }
+    }
 
     private boolean getCliModeOption() {
         if (args.getNonOptionArgs().isEmpty())
@@ -66,7 +65,7 @@ public class Config {
         if (resultValue.isEmpty())
             throw new IllegalArgumentException("Result path is required");
         else if (!resultValue.endsWith(".json") && !resultValue.endsWith(".csv"))
-            throw new IllegalArgumentException("Source path should have .json or .csv extension");
+            throw new IllegalArgumentException("Result path should have .json or .csv extension");
         else
             resultPath = Path.of(resultValue);
     }
@@ -75,7 +74,7 @@ public class Config {
         String defaultValue = "";
 
         List<String> values = args.getOptionValues(name);
-        if (values == null || args.getOptionNames().isEmpty())
+        if (values == null)
             return defaultValue;
 
         return values.getFirst();
