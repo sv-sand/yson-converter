@@ -93,10 +93,10 @@ example/output.json  # Converted JSON output
 ./gradlew test
 
 # Run a single test class
-./gradlew test --tests "ru.svsand.ysonconverter.YsonConverterApplicationTests"
+./gradlew test --tests "ru.svsand.ysonconverter.ApplicationTests"
 
 # Run a single test method
-./gradlew test --tests "ru.svsand.ysonconverter.YsonConverterApplicationTests.contextLoads"
+./gradlew test --tests "ru.svsand.ysonconverter.ApplicationTests.contextLoads"
 ```
 
 ## Dependencies

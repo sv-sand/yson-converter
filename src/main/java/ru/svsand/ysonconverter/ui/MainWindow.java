@@ -12,6 +12,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import ru.svsand.ysonconverter.Config;
+import ru.svsand.ysonconverter.Context;
+import ru.svsand.ysonconverter.Runner;
 import ru.svsand.ysonconverter.converter.Converter;
 import ru.svsand.ysonconverter.converter.ConverterYsonToCsv;
 import ru.svsand.ysonconverter.converter.ConverterYsonToJson;
@@ -106,28 +108,20 @@ public class MainWindow {
             return;
         }
 
-        // Create converter
+        // Update runner
         Config.Settings settings = new Config.Settings(
                 Path.of(sourcePath),
                 Path.of(resultPath)
         );
-        Config config = new Config(settings);
-        Converter converter;
-        if (resultPath.endsWith(".json"))
-            converter = new ConverterYsonToJson(config);
-        else if (resultPath.endsWith(".csv"))
-            converter = new ConverterYsonToCsv(config);
-        else {
-            showError("Result file must have a .json or .csv extension.");
-            return;
-        }
+        Runner runner = Context.getBean(Runner.class);
+        runner.getConfig().setSettings(settings);
 
         // Convert in task
         convertButton.setDisable(true);
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws IOException {
-                converter.convert();
+                runner.convert();
                 return null;
             }
         };

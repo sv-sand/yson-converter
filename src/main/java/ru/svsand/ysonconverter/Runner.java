@@ -2,6 +2,7 @@ package ru.svsand.ysonconverter;
 
 import javafx.application.Platform;
 import javafx.stage.Stage;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -22,6 +23,7 @@ import static java.lang.System.exit;
 @Component
 public class Runner implements ApplicationRunner {
 
+    @Getter
     private Config config;
 
     /**
@@ -38,6 +40,18 @@ public class Runner implements ApplicationRunner {
             cliConvert();
         else
             launchUi();
+    }
+
+    public void convert() throws IOException{
+        Converter converter;
+        if (config.getSettings().resultPath().toString().endsWith(".json"))
+            converter = new ConverterYsonToJson(config);
+        else if (config.getSettings().resultPath().toString().endsWith(".csv"))
+            converter = new ConverterYsonToCsv(config);
+        else
+            throw new RuntimeException("Wrong result path");
+
+        converter.convert();
     }
 
     private void printHelp() {
@@ -58,16 +72,8 @@ public class Runner implements ApplicationRunner {
     }
 
     private void cliConvert() {
-        Converter converter;
-        if (config.getSettings().resultPath().toString().endsWith(".json"))
-            converter = new ConverterYsonToJson(config);
-        else if (config.getSettings().resultPath().toString().endsWith(".csv"))
-            converter = new ConverterYsonToCsv(config);
-        else
-            throw new RuntimeException("Wrong result path");
-
         try {
-            converter.convert();
+            convert();
         } catch (IOException e) {
             log.error("Failed to convert file", e);
             exit(1);

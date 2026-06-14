@@ -26,6 +26,11 @@ public class ConverterYsonToCsv implements Converter {
         this.config = config;
     }
 
+    /**
+     * Converts the YSON file
+     *
+     * @throws IOException if reading the input or writing the output fails
+     */
     @Override
     public void convert() throws IOException {
         log.info("Start conversion {} to {}",

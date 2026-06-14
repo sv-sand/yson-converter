@@ -26,10 +26,11 @@ public class ConverterYsonToJson implements Converter {
     }
 
     /**
-     * Converts the YSON file at the given input path to JSON and writes it to the output path.
+     * Converts the YSON file
      *
      * @throws IOException if reading the input or writing the output fails
      */
+    @Override
     public void convert() throws IOException {
         log.info("Start conversion {} to {}",
                 config.getSettings().sourcePath().getFileName(),

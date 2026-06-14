@@ -5,7 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
-class YsonConverterApplicationTests {
+class ApplicationTests {
 
     @MockitoBean
     private Runner runner;
