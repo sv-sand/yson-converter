@@ -17,11 +17,11 @@ import static java.lang.System.exit;
  */
 @Slf4j
 @Component
-public class Launcher implements ApplicationRunner {
+public class Runner implements ApplicationRunner {
 
     private final Config config;
 
-    public Launcher(Config config) {
+    public Runner(Config config) {
         this.config = config;
     }
 
@@ -32,8 +32,28 @@ public class Launcher implements ApplicationRunner {
      */
     @Override
     public void run(ApplicationArguments args) {
-        if (config.isCliMode())
+        if (args.containsOption("help"))
+            printHelp();
+
+        else if (config.isCliMode())
             convert();
+    }
+
+    private void printHelp() {
+        System.out.println("""
+                Converter YSON files to JSON, CSV
+                Help dialog:
+                    java -jar yson-converter.jar --help
+                
+                Launch in interface mode:
+                    java -jar yson-converter.jar ui
+                
+                Usage in cli mode:
+                    java -jar yson-converter.jar cli --source=<file.yson> --result=<file>
+                Options:
+                  --source=<path>   Path to the source .yson file (required)
+                  --result=<path>   Path to the output file; must end in .json or .csv (required)
+                """);
     }
 
     private void convert() {
