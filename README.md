@@ -30,6 +30,22 @@ The JAR is produced at `build/libs/yson-converter-1.0.0.jar`.
 java -jar yson-converter.jar --help
 ```
 
+### UI mode
+
+Launch the graphical interface by running the JAR with no subcommand:
+
+```bash
+java -jar yson-converter.jar
+```
+
+A JavaFX window opens with:
+
+- **Source path** — path to the `.yson` file to convert (use **Browse...** to pick one)
+- **Result path** — path for the output file; extension determines format (`.json` or `.csv`) (use **Browse...** to pick a location)
+- **Convert** — starts the conversion; the button is disabled while conversion runs and a dialog confirms success or failure
+
+The last-used source and result paths are saved to `settings.cfg` in the working directory and restored automatically on the next launch.
+
 ### CLI mode
 
 ```bash
