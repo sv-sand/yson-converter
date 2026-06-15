@@ -14,6 +14,11 @@ import java.util.List;
 @Slf4j
 public class Config {
 
+    public record Parameters(
+            Path sourcePath,
+            Path resultPath
+    ) {}
+
     @Getter
     private boolean help;
 
@@ -22,11 +27,6 @@ public class Config {
 
     @Getter @Setter
     private Parameters parameters;
-
-    public record Parameters(
-            Path sourcePath,
-            Path resultPath
-    ) {}
 
     public Config(ApplicationArguments args) {
         parseArgs(args);

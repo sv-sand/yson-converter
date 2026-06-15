@@ -12,7 +12,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import ru.svsand.ysonconverter.Config;
 import ru.svsand.ysonconverter.Runner;
 import ru.svsand.ysonconverter.converter.Converter;
 
@@ -20,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import ru.svsand.ysonconverter.SettingsService;
+import ru.svsand.ysonconverter.SettingsService.Settings;
 
 /**
  * Main application window for UI mode.
@@ -28,8 +28,10 @@ import ru.svsand.ysonconverter.SettingsService;
 @Slf4j
 public class MainWindow {
 
+    private static final Path SETTINGS_PATH = Path.of("settings.cfg");
+
     private final Stage stage;
-    private final SettingsService settingsService = new SettingsService();
+    private final SettingsService settingsService = new SettingsService(SETTINGS_PATH);
     private final TextField sourcePathField = new TextField();
     private final TextField resultPathField = new TextField();
     private final Button selectSourceButton = new Button("Browse...");
@@ -148,16 +150,16 @@ public class MainWindow {
     }
 
     private void saveSettings() {
-        settingsService.save(new Config.Parameters(
+        settingsService.save(new Settings(
                 Path.of(sourcePathField.getText().trim()),
                 Path.of(resultPathField.getText().trim())
         ));
     }
 
     private void restoreSettings() {
-        settingsService.load().ifPresent(params -> {
-            sourcePathField.setText(params.sourcePath().toString());
-            resultPathField.setText(params.resultPath().toString());
+        settingsService.load().ifPresent(settings -> {
+            sourcePathField.setText(settings.sourcePath().toString());
+            resultPathField.setText(settings.resultPath().toString());
         });
     }
 }

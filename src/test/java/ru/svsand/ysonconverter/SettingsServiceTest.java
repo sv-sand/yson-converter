@@ -19,30 +19,30 @@ class SettingsServiceTest {
         SettingsService service = new SettingsService(tempDir.resolve("settings.cfg"));
 
         // Act
-        Optional<Config.Parameters> result = service.load();
+        Optional<SettingsService.Settings> result = service.load();
 
         // Assert
         assertThat(result).isEmpty();
     }
 
     @Test
-    void saveAndLoad_roundTrip_restoresParameters() {
+    void saveAndLoad_roundTrip_restoresSettings() {
         // Arrange
         Path settingsFile = tempDir.resolve("settings.cfg");
         SettingsService service = new SettingsService(settingsFile);
-        Config.Parameters params = new Config.Parameters(
+        SettingsService.Settings settings = new SettingsService.Settings(
                 Path.of("/data/input.yson"),
                 Path.of("/data/output.json")
         );
 
         // Act
-        service.save(params);
-        Optional<Config.Parameters> loaded = service.load();
+        service.save(settings);
+        Optional<SettingsService.Settings> loaded = service.load();
 
         // Assert
         assertThat(loaded).isPresent();
-        assertThat(loaded.get().sourcePath()).isEqualTo(params.sourcePath());
-        assertThat(loaded.get().resultPath()).isEqualTo(params.resultPath());
+        assertThat(loaded.get().sourcePath()).isEqualTo(settings.sourcePath());
+        assertThat(loaded.get().resultPath()).isEqualTo(settings.resultPath());
     }
 
     @Test
@@ -53,7 +53,7 @@ class SettingsServiceTest {
         SettingsService service = new SettingsService(settingsFile);
 
         // Act
-        Optional<Config.Parameters> result = service.load();
+        Optional<SettingsService.Settings> result = service.load();
 
         // Assert
         assertThat(result).isEmpty();
@@ -64,13 +64,13 @@ class SettingsServiceTest {
         // Arrange
         Path settingsFile = tempDir.resolve("settings.cfg");
         SettingsService service = new SettingsService(settingsFile);
-        Config.Parameters first = new Config.Parameters(Path.of("a.yson"), Path.of("a.json"));
-        Config.Parameters second = new Config.Parameters(Path.of("b.yson"), Path.of("b.csv"));
+        SettingsService.Settings first = new SettingsService.Settings(Path.of("a.yson"), Path.of("a.json"));
+        SettingsService.Settings second = new SettingsService.Settings(Path.of("b.yson"), Path.of("b.csv"));
 
         // Act
         service.save(first);
         service.save(second);
-        Optional<Config.Parameters> loaded = service.load();
+        Optional<SettingsService.Settings> loaded = service.load();
 
         // Assert
         assertThat(loaded).isPresent();
