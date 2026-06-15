@@ -13,13 +13,13 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import ru.svsand.ysonconverter.Config;
-import ru.svsand.ysonconverter.Context;
 import ru.svsand.ysonconverter.Runner;
 import ru.svsand.ysonconverter.converter.Converter;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import ru.svsand.ysonconverter.SettingsService;
 
 /**
  * Main application window for UI mode.
@@ -29,12 +29,12 @@ import java.nio.file.Path;
 public class MainWindow {
 
     private final Stage stage;
+    private final SettingsService settingsService = new SettingsService();
     private final TextField sourcePathField = new TextField();
     private final TextField resultPathField = new TextField();
-    private Button selectSourceButton = new Button("Browse...");
-    private Button selectResultButton = new Button("Browse...");
+    private final Button selectSourceButton = new Button("Browse...");
+    private final Button selectResultButton = new Button("Browse...");
     private final Button convertButton = new Button("Convert");
-
 
     /**
      * Constructs the main window and configures the given stage.
@@ -43,10 +43,11 @@ public class MainWindow {
      */
     public MainWindow(Stage stage) {
         this.stage = stage;
-        initUI();
+        initStage();
+        restoreSettings();
     }
 
-    private void initUI() {
+    private void initStage() {
         sourcePathField.setPrefWidth(420);
         resultPathField.setPrefWidth(420);
         selectSourceButton.setOnAction(e -> openFileDialog(sourcePathField));
@@ -109,6 +110,8 @@ public class MainWindow {
         Converter converter = Runner.createConverter(sourcePath, resultPath);
         Task<Void> task = createConversionTask(converter);
         new Thread(task, "converter-thread").start();
+
+        saveSettings();
     }
 
     private @NonNull Task<Void> createConversionTask(Converter converter) {
@@ -142,5 +145,19 @@ public class MainWindow {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ButtonType.OK);
         alert.setHeaderText(null);
         alert.showAndWait();
+    }
+
+    private void saveSettings() {
+        settingsService.save(new Config.Parameters(
+                Path.of(sourcePathField.getText().trim()),
+                Path.of(resultPathField.getText().trim())
+        ));
+    }
+
+    private void restoreSettings() {
+        settingsService.load().ifPresent(params -> {
+            sourcePathField.setText(params.sourcePath().toString());
+            resultPathField.setText(params.resultPath().toString());
+        });
     }
 }
