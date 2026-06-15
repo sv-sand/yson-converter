@@ -3,6 +3,7 @@ package ru.svsand.ysonconverter.converter;
 import lombok.Getter;
 import tech.ytsaurus.yson.YsonConsumer;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class YsonTableConsumer implements YsonConsumer {
 
 	@Override
 	public void onKeyedItem(byte[] value, int offset, int length) {
-		onKeyedItem(new String(value, offset, length));
+		onKeyedItem(new String(value, offset, length, StandardCharsets.UTF_8));
 	}
 
 	@Override
@@ -82,7 +83,7 @@ public class YsonTableConsumer implements YsonConsumer {
 
 	@Override
 	public void onString(byte[] value, int offset, int length) {
-		onString(new String(value, offset, length));
+		onString(new String(value, offset, length, StandardCharsets.UTF_8));
 	}
 
 	@Override

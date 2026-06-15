@@ -1,83 +1,85 @@
 package ru.svsand.ysonconverter;
 
-import jakarta.annotation.PostConstruct;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
-import org.springframework.context.annotation.Configuration;
 
 import java.nio.file.Path;
 import java.util.List;
-
-import static java.lang.System.exit;
 
 /**
  * Spring configuration that wires application-level beans.
  */
 @Slf4j
-@Configuration
 public class Config {
 
-    private final ApplicationArguments args;
+    public record Parameters(
+            Path sourcePath,
+            Path resultPath
+    ) {}
+
+    @Getter
+    private boolean help;
 
     @Getter
     private boolean cliMode;
 
-    @Getter
-    private Path sourcePath;
-
-    @Getter
-    private Path resultPath;
+    @Getter @Setter
+    private Parameters parameters;
 
     public Config(ApplicationArguments args) {
-        this.args = args;
+        parseArgs(args);
     }
 
-    @PostConstruct
-    private void init() {
-        // Most important option
-        cliMode = getCliModeOption();
-		try {
-			if(cliMode)
-                parseCliArgs();
-	    } catch (IllegalArgumentException e) {
-            log.error("Incorrect options", e);
-            exit(1);
-		}
-	}
+    public Config(Parameters parameters) {
+        this.parameters = parameters;
+    }
 
-    private boolean getCliModeOption() {
+    private void parseArgs(ApplicationArguments args) {
+        help = parseHelp(args);
+        cliMode = parseCliMode(args);
+
+        if (cliMode) {
+            parameters = new Parameters(
+                    parseSourcePath(args),
+                    parseResultPath(args)
+            );
+        }
+    }
+
+    private boolean parseHelp(ApplicationArguments args) {
+        return args.containsOption("help");
+    }
+
+    private boolean parseCliMode(ApplicationArguments args) {
         if (args.getNonOptionArgs().isEmpty())
             return false;
 
         return args.getNonOptionArgs().getFirst().equals("cli");
     }
 
-    private void parseCliArgs() throws IllegalArgumentException {
-        String sourceValue = getCliOption("source");
-        if (sourceValue.isEmpty())
+    private Path parseSourcePath(ApplicationArguments args) {
+        List<String> values = args.getOptionValues("source");
+        if (values == null || values.getFirst().isEmpty())
             throw new IllegalArgumentException("Source path is required");
-        else if (!sourceValue.endsWith(".yson"))
-            throw new IllegalArgumentException("Source path should have .yson extension");
-        else
-            sourcePath = Path.of(sourceValue);
 
-        String resultValue = getCliOption("result");
-        if (resultValue.isEmpty())
-            throw new IllegalArgumentException("Result path is required");
-        else if (!resultValue.endsWith(".json") && !resultValue.endsWith(".csv"))
-            throw new IllegalArgumentException("Source path should have .json or .csv extension");
-        else
-            resultPath = Path.of(resultValue);
+        String value = values.getFirst();
+        if (!value.endsWith(".yson"))
+            throw new IllegalArgumentException("Source path should have .yson extension");
+
+        return Path.of(value);
     }
 
-    private String getCliOption(String name) {
-        String defaultValue = "";
+    private Path parseResultPath(ApplicationArguments args) {
+        List<String> values = args.getOptionValues("result");
+        if (values == null || values.getFirst().isEmpty())
+            throw new IllegalArgumentException("Result path is required");
 
-        List<String> values = args.getOptionValues(name);
-        if (values == null || args.getOptionNames().isEmpty())
-            return defaultValue;
+        String value = values.getFirst();
+        if (!value.endsWith(".json") && !value.endsWith(".csv"))
+            throw new IllegalArgumentException("Result path should have .json or .csv extension");
 
-        return values.getFirst();
+        return Path.of(value);
     }
 }

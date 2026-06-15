@@ -3,13 +3,12 @@ package ru.svsand.ysonconverter;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import ru.svsand.ysonconverter.converter.ConverterYsonToJson;
 
 @SpringBootTest
-class YsonConverterApplicationTests {
+class ApplicationTests {
 
     @MockitoBean
-    private ConverterYsonToJson converterYsonToJson;
+    private Runner runner;
 
     @Test
     void contextLoads() {

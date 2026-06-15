@@ -1,9 +1,6 @@
 package ru.svsand.ysonconverter.converter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import ru.svsand.ysonconverter.Config;
 import tech.ytsaurus.yson.YsonConsumer;
 import tech.ytsaurus.yson.YsonParser;
@@ -16,37 +13,46 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Spring component that converts YSON files to JSON format.
+ * Converter that transforms YSON list-fragment files into semicolon-delimited CSV.
  */
 @Slf4j
-@Component
 public class ConverterYsonToCsv implements Converter {
 
-    private final Config config;
+    private final Config.Parameters parameters;
+    private final StringBuffer buffer = new StringBuffer();
+    private boolean headersWrote = false;
 
-    StringBuffer buffer = new StringBuffer();
-    boolean headersWrote = false;
-
-    @Autowired
-    public ConverterYsonToCsv(Config config) {
-        this.config = config;
+    public ConverterYsonToCsv(Config.Parameters parameters) {
+        this.parameters = parameters;
     }
 
+    /**
+     * Converts the YSON file
+     *
+     * @throws IOException if reading the input or writing the output fails
+     */
     @Override
     public void convert() throws IOException {
-        log.info("Start conversion {} to {}", config.getSourcePath().getFileName(), config.getResultPath().getFileName());
+        log.info("Start conversion {} to {}",
+                parameters.sourcePath().getFileName(),
+                parameters.resultPath().getFileName()
+        );
 
         headersWrote = false;
+        buffer.setLength(0);
 
         log.info("Parsing YSON");
-        try (InputStream inputStream = Files.newInputStream(config.getSourcePath())) {
+        try (InputStream inputStream = Files.newInputStream(parameters.sourcePath())) {
             parseYson(inputStream);
         } catch (IOException e) {
             log.error("Failed to parse YSON", e);
             throw e;
         }
 
-        log.info("File {} has been converted to {}", config.getSourcePath().getFileName(), config.getResultPath().getFileName());
+        log.info("File {} has been converted to {}",
+                parameters.sourcePath().getFileName(),
+                parameters.resultPath().getFileName()
+        );
     }
 
     private void parseYson(InputStream inputStream) {
@@ -58,7 +64,7 @@ public class ConverterYsonToCsv implements Converter {
                 super.onEndMap();
             }
         };
-        parser.parseListFragmentItem(consumer);
+        while (parser.parseListFragmentItem(consumer)) {}
         writeBufferRows();
     }
 
@@ -83,7 +89,7 @@ public class ConverterYsonToCsv implements Converter {
                 .map(Object::toString)
                 .collect(Collectors.joining(";"));
 		try {
-			Files.writeString(config.getResultPath(), headers);
+			Files.writeString(parameters.resultPath(), headers);
 	    } catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -94,7 +100,7 @@ public class ConverterYsonToCsv implements Converter {
 
     private void writeBufferRows() {
 		try {
-			Files.writeString(config.getResultPath(), buffer.toString(), StandardOpenOption.APPEND);
+			Files.writeString(parameters.resultPath(), buffer.toString(), StandardOpenOption.APPEND);
 	    } catch (IOException e) {
 			throw new RuntimeException(e);
 		}
