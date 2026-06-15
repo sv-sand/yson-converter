@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ConverterYsonToCsv implements Converter {
 
-    private final Config config;
+    private final Config.Parameters parameters;
     private final StringBuffer buffer = new StringBuffer();
     private boolean headersWrote = false;
 
-    public ConverterYsonToCsv(Config config) {
-        this.config = config;
+    public ConverterYsonToCsv(Config.Parameters parameters) {
+        this.parameters = parameters;
     }
 
     /**
@@ -34,15 +34,15 @@ public class ConverterYsonToCsv implements Converter {
     @Override
     public void convert() throws IOException {
         log.info("Start conversion {} to {}",
-                config.getSettings().sourcePath().getFileName(),
-                config.getSettings().resultPath().getFileName()
+                parameters.sourcePath().getFileName(),
+                parameters.resultPath().getFileName()
         );
 
         headersWrote = false;
         buffer.setLength(0);
 
         log.info("Parsing YSON");
-        try (InputStream inputStream = Files.newInputStream(config.getSettings().sourcePath())) {
+        try (InputStream inputStream = Files.newInputStream(parameters.sourcePath())) {
             parseYson(inputStream);
         } catch (IOException e) {
             log.error("Failed to parse YSON", e);
@@ -50,8 +50,8 @@ public class ConverterYsonToCsv implements Converter {
         }
 
         log.info("File {} has been converted to {}",
-                config.getSettings().sourcePath().getFileName(),
-                config.getSettings().resultPath().getFileName()
+                parameters.sourcePath().getFileName(),
+                parameters.resultPath().getFileName()
         );
     }
 
@@ -89,7 +89,7 @@ public class ConverterYsonToCsv implements Converter {
                 .map(Object::toString)
                 .collect(Collectors.joining(";"));
 		try {
-			Files.writeString(config.getSettings().resultPath(), headers);
+			Files.writeString(parameters.resultPath(), headers);
 	    } catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -100,7 +100,7 @@ public class ConverterYsonToCsv implements Converter {
 
     private void writeBufferRows() {
 		try {
-			Files.writeString(config.getSettings().resultPath(), buffer.toString(), StandardOpenOption.APPEND);
+			Files.writeString(parameters.resultPath(), buffer.toString(), StandardOpenOption.APPEND);
 	    } catch (IOException e) {
 			throw new RuntimeException(e);
 		}

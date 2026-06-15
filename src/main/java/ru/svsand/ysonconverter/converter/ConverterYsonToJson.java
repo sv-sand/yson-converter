@@ -18,11 +18,11 @@ import java.nio.file.Path;
 @Slf4j
 public class ConverterYsonToJson implements Converter {
 
-    private final Config config;
+    private final Config.Parameters parameters;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ConverterYsonToJson(Config config) {
-        this.config = config;
+    public ConverterYsonToJson(Config.Parameters parameters) {
+        this.parameters = parameters;
     }
 
     /**
@@ -33,24 +33,24 @@ public class ConverterYsonToJson implements Converter {
     @Override
     public void convert() throws IOException {
         log.info("Start conversion {} to {}",
-                config.getSettings().sourcePath().getFileName(),
-                config.getSettings().resultPath().getFileName()
+                parameters.sourcePath().getFileName(),
+                parameters.resultPath().getFileName()
         );
 
         log.info("Parsing YSON");
-        YTreeNode ysonNode = parseYson(config.getSettings().sourcePath());
+        YTreeNode ysonNode = parseYson(parameters.sourcePath());
 
         log.info("Converting YSON to JSON");
         JsonNode jsonNode = YsonJsonConverter.yson2json(JsonNodeFactory.instance, ysonNode);
 
         log.info("Writing JSON");
-        File outputFile = new File(config.getSettings().resultPath().toString());
+        File outputFile = new File(parameters.resultPath().toString());
         objectMapper.writerWithDefaultPrettyPrinter()
                 .writeValue(outputFile, jsonNode);
 
         log.info("File {} converted to {}",
-                config.getSettings().sourcePath().getFileName(),
-                config.getSettings().resultPath().getFileName()
+                parameters.sourcePath().getFileName(),
+                parameters.resultPath().getFileName()
         );
     }
 

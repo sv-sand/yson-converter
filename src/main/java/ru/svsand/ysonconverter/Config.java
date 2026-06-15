@@ -8,8 +8,6 @@ import org.springframework.boot.ApplicationArguments;
 import java.nio.file.Path;
 import java.util.List;
 
-import static java.lang.System.exit;
-
 /**
  * Spring configuration that wires application-level beans.
  */
@@ -23,9 +21,9 @@ public class Config {
     private boolean cliMode;
 
     @Getter @Setter
-    private Settings settings;
+    private Parameters parameters;
 
-    public record Settings (
+    public record Parameters(
             Path sourcePath,
             Path resultPath
     ) {}
@@ -34,24 +32,19 @@ public class Config {
         parseArgs(args);
     }
 
-    public Config(Settings settings) {
-        this.settings = settings;
+    public Config(Parameters parameters) {
+        this.parameters = parameters;
     }
 
     private void parseArgs(ApplicationArguments args) {
         help = parseHelp(args);
         cliMode = parseCliMode(args);
 
-        try {
-            if (cliMode) {
-                settings = new Settings(
-                        parseSourcePath(args),
-                        parseResultPath(args)
-                );
-            }
-        } catch (IllegalArgumentException e) {
-            log.error("Incorrect options", e);
-            exit(1);
+        if (cliMode) {
+            parameters = new Parameters(
+                    parseSourcePath(args),
+                    parseResultPath(args)
+            );
         }
     }
 

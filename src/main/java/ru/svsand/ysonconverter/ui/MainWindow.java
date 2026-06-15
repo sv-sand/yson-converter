@@ -11,12 +11,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import ru.svsand.ysonconverter.Config;
 import ru.svsand.ysonconverter.Context;
 import ru.svsand.ysonconverter.Runner;
 import ru.svsand.ysonconverter.converter.Converter;
-import ru.svsand.ysonconverter.converter.ConverterYsonToCsv;
-import ru.svsand.ysonconverter.converter.ConverterYsonToJson;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +31,10 @@ public class MainWindow {
     private final Stage stage;
     private final TextField sourcePathField = new TextField();
     private final TextField resultPathField = new TextField();
+    private Button selectSourceButton = new Button("Browse...");
+    private Button selectResultButton = new Button("Browse...");
     private final Button convertButton = new Button("Convert");
+
 
     /**
      * Constructs the main window and configures the given stage.
@@ -47,16 +49,12 @@ public class MainWindow {
     private void initUI() {
         sourcePathField.setPrefWidth(420);
         resultPathField.setPrefWidth(420);
-
-        Button selectSourceButton = new Button("Browse...");
         selectSourceButton.setOnAction(e -> openFileDialog(sourcePathField));
-
-        Button selectResultButton = new Button("Browse...");
         selectResultButton.setOnAction(e -> saveFileDialog(resultPathField));
+        convertButton.setOnAction(e -> convert());
 
-        GridPane grid = new GridPane();
-        grid.setHgap(8);
-        grid.setVgap(10);
+        // Place elements
+        GridPane grid = new GridPane(8, 10);
         grid.add(new Label("Source path:"), 0, 0);
         grid.add(sourcePathField, 1, 0);
         grid.add(selectSourceButton, 2, 0);
@@ -64,11 +62,10 @@ public class MainWindow {
         grid.add(resultPathField, 1, 1);
         grid.add(selectResultButton, 2, 1);
 
-        convertButton.setOnAction(e -> convert());
-        HBox buttonRow = new HBox(convertButton);
-        buttonRow.setAlignment(Pos.CENTER);
+        HBox buttonConvertRow = new HBox(convertButton);
+        buttonConvertRow.setAlignment(Pos.CENTER);
 
-        VBox root = new VBox(16, grid, buttonRow);
+        VBox root = new VBox(16, grid, buttonConvertRow);
         root.setPadding(new Insets(16));
 
         stage.setTitle("YSON Converter");
@@ -108,20 +105,18 @@ public class MainWindow {
             return;
         }
 
-        // Update runner
-        Config.Settings settings = new Config.Settings(
-                Path.of(sourcePath),
-                Path.of(resultPath)
-        );
-        Runner runner = Context.getBean(Runner.class);
-        runner.getConfig().setSettings(settings);
-
         // Convert in task
-        convertButton.setDisable(true);
+        Converter converter = Runner.createConverter(sourcePath, resultPath);
+        Task<Void> task = createConversionTask(converter);
+        new Thread(task, "converter-thread").start();
+    }
+
+    private @NonNull Task<Void> createConversionTask(Converter converter) {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws IOException {
-                runner.convert();
+                convertButton.setDisable(true);
+                converter.convert();
                 return null;
             }
         };
@@ -134,7 +129,7 @@ public class MainWindow {
             log.error("Conversion failed", task.getException());
             showError("Conversion failed: " + task.getException().getMessage());
         });
-        new Thread(task, "converter-thread").start();
+        return task;
     }
 
     private void showError(String message) {

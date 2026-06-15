@@ -13,6 +13,7 @@ import ru.svsand.ysonconverter.converter.ConverterYsonToJson;
 import ru.svsand.ysonconverter.ui.MainWindow;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import static java.lang.System.exit;
 
@@ -42,16 +43,22 @@ public class Runner implements ApplicationRunner {
             launchUi();
     }
 
-    public void convert() throws IOException{
-        Converter converter;
-        if (config.getSettings().resultPath().toString().endsWith(".json"))
-            converter = new ConverterYsonToJson(config);
-        else if (config.getSettings().resultPath().toString().endsWith(".csv"))
-            converter = new ConverterYsonToCsv(config);
+    public static Converter createConverter(Config.Parameters parameters) {
+        if (parameters.resultPath().toString().endsWith(".json"))
+            return new ConverterYsonToJson(parameters);
+        else if (parameters.resultPath().toString().endsWith(".csv"))
+            return new ConverterYsonToCsv(parameters);
         else
             throw new RuntimeException("Wrong result path");
+    }
 
-        converter.convert();
+    public static Converter createConverter(String sourcePath, String resultPath) {
+        Config.Parameters parameters = new Config.Parameters(
+                Path.of(sourcePath),
+                Path.of(resultPath)
+        );
+
+        return createConverter(parameters);
     }
 
     private void printHelp() {
@@ -73,7 +80,8 @@ public class Runner implements ApplicationRunner {
 
     private void cliConvert() {
         try {
-            convert();
+            Converter converter = createConverter(config.getParameters());
+            converter.convert();
         } catch (IOException e) {
             log.error("Failed to convert file", e);
             exit(1);
