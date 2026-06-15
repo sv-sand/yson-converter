@@ -61,6 +61,9 @@ public class SettingsService {
         String source = props.getProperty(KEY_SOURCE, "").trim();
         String result = props.getProperty(KEY_RESULT, "").trim();
 
+        if (source.isEmpty() || result.isEmpty())
+            return Optional.empty();
+
         Settings settings = new Settings(Path.of(source), Path.of(result));
 
         log.info("Settings has been loaded from file: {}", path);
