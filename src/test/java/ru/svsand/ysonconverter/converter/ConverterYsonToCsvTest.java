@@ -11,8 +11,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class ConverterYsonToCsvTest {
 
@@ -23,10 +21,7 @@ class ConverterYsonToCsvTest {
         Path result = tempDir.resolve("output.csv");
         Files.writeString(source, "{score=42;label=\"pass\"}");
 
-        Config config = mock(Config.class);
-        when(config.getParameters()).thenReturn(new Config.Parameters(source, result));
-
-        ConverterYsonToCsv converter = new ConverterYsonToCsv(config);
+        ConverterYsonToCsv converter = new ConverterYsonToCsv(new Config.Parameters(source, result));
 
         // Act
         converter.convert();
@@ -52,10 +47,7 @@ class ConverterYsonToCsvTest {
         Path result = tempDir.resolve("output.csv");
         Files.writeString(source, "{id=1;name=\"Alice\"};{id=2;name=\"Bob\"}");
 
-        Config config = mock(Config.class);
-        when(config.getParameters()).thenReturn(new Config.Parameters(source, result));
-
-        ConverterYsonToCsv converter = new ConverterYsonToCsv(config);
+        ConverterYsonToCsv converter = new ConverterYsonToCsv(new Config.Parameters(source, result));
 
         // Act
         converter.convert();
@@ -85,10 +77,7 @@ class ConverterYsonToCsvTest {
         Path source = tempDir.resolve("nonexistent.yson");
         Path result = tempDir.resolve("output.csv");
 
-        Config config = mock(Config.class);
-        when(config.getParameters()).thenReturn(new Config.Parameters(source, result));
-
-        ConverterYsonToCsv converter = new ConverterYsonToCsv(config);
+        ConverterYsonToCsv converter = new ConverterYsonToCsv(new Config.Parameters(source, result));
 
         // Act & Assert
         assertThrows(IOException.class, converter::convert);

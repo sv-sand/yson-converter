@@ -12,8 +12,6 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class ConverterYsonToJsonTest {
 
@@ -26,10 +24,7 @@ class ConverterYsonToJsonTest {
         Path result = tempDir.resolve("output.json");
         Files.writeString(source, "{a=1;b=\"hello\";c=%true}");
 
-        Config config = mock(Config.class);
-        when(config.getParameters()).thenReturn(new Config.Parameters(source, result));
-
-        ConverterYsonToJson converter = new ConverterYsonToJson(config);
+        ConverterYsonToJson converter = new ConverterYsonToJson(new Config.Parameters(source, result));
 
         // Act
         converter.convert();
@@ -49,10 +44,7 @@ class ConverterYsonToJsonTest {
         Path result = tempDir.resolve("output.json");
         Files.writeString(source, "{count=42;ratio=3.14}");
 
-        Config config = mock(Config.class);
-        when(config.getParameters()).thenReturn(new Config.Parameters(source, result));
-
-        ConverterYsonToJson converter = new ConverterYsonToJson(config);
+        ConverterYsonToJson converter = new ConverterYsonToJson(new Config.Parameters(source, result));
 
         // Act
         converter.convert();
@@ -69,10 +61,7 @@ class ConverterYsonToJsonTest {
         Path source = tempDir.resolve("nonexistent.yson");
         Path result = tempDir.resolve("output.json");
 
-        Config config = mock(Config.class);
-        when(config.getParameters()).thenReturn(new Config.Parameters(source, result));
-
-        ConverterYsonToJson converter = new ConverterYsonToJson(config);
+        ConverterYsonToJson converter = new ConverterYsonToJson(new Config.Parameters(source, result));
 
         // Act & Assert
         assertThrows(IOException.class, converter::convert);
