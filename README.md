@@ -1,3 +1,6 @@
+[![Java CI with Gradle](https://github.com/sv-sand/yson-converter/actions/workflows/gradle.yml/badge.svg)](https://github.com/sv-sand/yson-converter/actions/workflows/gradle.yml)
+[![Gradle Package](https://github.com/sv-sand/yson-converter/actions/workflows/gradle-publish.yml/badge.svg)](https://github.com/sv-sand/yson-converter/actions/workflows/gradle-publish.yml)
+
 # YSON Converter
 
 A command-line tool that converts [YSON](https://ytsaurus.tech/docs/en/yql/udf/list/yson) files (used in YTsaurus/YQL) to **JSON** or **CSV**.
